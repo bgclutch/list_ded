@@ -27,18 +27,18 @@ int main(void)
     LIST_ERR(list_insert_after(&My_List, 3, 8989), INSERTION_ERROR);
     list_dump(My_List.list, dump_file);
 
-    // LIST_ERR(list_insert_after(&My_List, 1, 5051), INSERTION_ERROR);
-    // list_dump(My_List.list, dump_file);
+    LIST_ERR(list_insert_after(&My_List, 1, 5051), INSERTION_ERROR);
+    list_dump(My_List.list, dump_file);
 
     LIST_ERR(list_insert_after(&My_List, 4, 5), INSERTION_ERROR);
     list_dump(My_List.list, dump_file);
 
-    // LIST_ERR(list_insert_after(&My_List, 2, 909090), INSERTION_ERROR);
-    // list_dump(My_List.list, dump_file);
-
-
-    LIST_ERR(list_erase(&My_List, 2), ERASING_ERROR);
+    LIST_ERR(list_insert_after(&My_List, 2, 909090), INSERTION_ERROR);
     list_dump(My_List.list, dump_file);
+
+
+    // LIST_ERR(list_erase(&My_List, 2), ERASING_ERROR);
+    // list_dump(My_List.list, dump_file);
 
 
     LIST_ERR(dtor_list(&My_List), LIST_DTOR_ERR);

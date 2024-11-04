@@ -111,9 +111,13 @@ List_Errors list_insert_after(Node_Array* My_List, const int pre_insert_index, c
     My_List->list[insert_index].next = My_List->list[pre_insert_index].next;    // change next for insert
     My_List->list[pre_insert_index].next = insert_index;                        // change next for pre_insert
 
-    My_List->list[My_List->list[insert_index].next].prev = My_List->list[pre_insert_index].next;   // change prev for post_insert
+    int tail_saver = My_List->list[LIST_PHANTOM_INDEX].prev;
+
+    int following_index = My_List->list[insert_index].next;
+    My_List->list[following_index].prev = My_List->list[pre_insert_index].next;   // change prev for post_insert
 
     My_List->list[LIST_PHANTOM_INDEX].next = My_List->free;
+    My_List->list[LIST_PHANTOM_INDEX].prev = tail_saver;
 
     return LIST_IS_OK;
 }
