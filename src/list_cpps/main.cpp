@@ -1,28 +1,49 @@
 #include <stdio.h>
+#include <assert.h>
 
-#include "list_headers/list.h"
-#include "lib_file_proc/file.h"
+#include "../list_headers/list.h"
+#include "../../lib_file_proc/file.h"
 
-int main()
+int main(void)
 {
-    List* list = {};
+    Node_Array My_List = {};
+
+    LIST_ERR(ctor_list(&My_List), LIST_CTOR_ERR);
 
     FILE* dump_file = nullptr;
-    FILE_ERR(file_read_open(&dump_file, DUMP_FILE_NAME), FILE_W_OPEN_ERR);
+    FILE_ERR(file_write_open(&dump_file, DUMP_FILE_NAME), FILE_W_OPEN_ERR);
 
-    LIST_ERR(ctor_list(list), LIST_CTOR_ERR);
+    list_dump(My_List.list, dump_file);
+
+    LIST_ERR(list_insert_after(&My_List, 0, 12), INSERTION_ERROR);
+    list_dump(My_List.list, dump_file);
+
+    LIST_ERR(list_insert_after(&My_List, 1, 1), INSERTION_ERROR);
+    list_dump(My_List.list, dump_file);
+
+    LIST_ERR(list_insert_after(&My_List, 2, 121), INSERTION_ERROR);
+    list_dump(My_List.list, dump_file);
+
+    LIST_ERR(list_insert_after(&My_List, 3, 8989), INSERTION_ERROR);
+    list_dump(My_List.list, dump_file);
+
+    // LIST_ERR(list_insert_after(&My_List, 1, 5051), INSERTION_ERROR);
+    // list_dump(My_List.list, dump_file);
+
+    LIST_ERR(list_insert_after(&My_List, 4, 5), INSERTION_ERROR);
+    list_dump(My_List.list, dump_file);
+
+    // LIST_ERR(list_insert_after(&My_List, 2, 909090), INSERTION_ERROR);
+    // list_dump(My_List.list, dump_file);
 
 
-    for(size_t index_list = LIST_START_INDEX; index_list < LIST_SIZE; index_list++)
-    {
-        list[index_list].data = index_list * 10;
-        list[index_list].elem_index = index_list;
-        list[index_list].prev = list[index_list - 1].elem_index;
-        list[index_list].next = LIST_PHANTOM_INDEX;
-    }
+    LIST_ERR(list_erase(&My_List, 2), ERASING_ERROR);
+    list_dump(My_List.list, dump_file);
 
 
-    LIST_ERR(dtor_list(list), LIST_DTOR_ERR);
+    LIST_ERR(dtor_list(&My_List), LIST_DTOR_ERR);
+
+    FILE_ERR(file_close(dump_file), FILE_CLOSE_ERR);
 
     return 0;
 }

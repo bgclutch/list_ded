@@ -4,13 +4,14 @@
 
 #include "file.h"
 
-Files_Errors file_read_open(FILE** file, const char* file_read_open)
+Files_Errors file_read_open(FILE** file, const char* filename)
 {
     assert(!*file);
+    assert(filename);
 
-    *file = fopen(file_read_open,  "r");
+    *file = fopen(filename,  "r");
 
-    if(file == nullptr)
+    if(*file == nullptr)
     {
         fprintf(stderr, "file read couldn't open fread open\n");
         return FILE_R_OPEN_ERR;
@@ -20,13 +21,13 @@ Files_Errors file_read_open(FILE** file, const char* file_read_open)
 }
 
 
-Files_Errors file_write_open(FILE** file, const char* file_write_open)
+Files_Errors file_write_open(FILE** file, const char* filename)
 {
     assert(!*file);
 
-    *file = fopen(file_write_open, "w");
+    *file = fopen(filename, "w");
 
-    if(file == nullptr)
+    if(*file == nullptr)
     {
         fprintf(stderr, "file write couldn't open\n");
         return FILE_W_OPEN_ERR;
@@ -51,6 +52,8 @@ Files_Errors file_close(FILE* file)
 
 Files_Errors file_is_err(Files_Errors result, const char* name, const size_t line)
 {
+    assert(name);
+
     if(result != ALL_GOOD_RET_F)
     {
         fprintf(stderr, "Error here: %s:%lu\n\n", name, line);
