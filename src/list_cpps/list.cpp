@@ -107,6 +107,9 @@ List_Errors list_insert_after(Node_Array* My_List, const int pre_insert_index, c
     My_List->list[LIST_PHANTOM_INDEX].next = insert_index;
     My_List->list[LIST_PHANTOM_INDEX].prev = tail_saver;
 
+    if(My_List->list[insert_index].prev == LIST_PHANTOM_INDEX)
+        My_List->list[LIST_PHANTOM_INDEX].prev = insert_index;
+
     return LIST_IS_OK;
 }
 
@@ -131,11 +134,15 @@ List_Errors list_erase(Node_Array* My_List, const int erase_index) // make elem 
     My_List->list[index_prev].next = My_List->list[erase_index].next; // make prev elem point to next
     My_List->list[index_next].prev = My_List->list[erase_index].prev; // make next elem point to prev
 
-    My_List->list[erase_index].prev = LIST_FREE_ATTR; // make erased elem empty
+    My_List->list[erase_index].prev = LIST_FREE_ATTR; // make erased elem empty by its attribute
 
     LIST_ERR(find_last_free(My_List, erase_index), FIND_LAST_FREE_ERR);
 
-    My_List->list[erase_index].data = LIST_POISON;    // make erased elem empty pointer
+    My_List->list[erase_index].data = LIST_POISON;    // make erased elem empty
+
+
+    if(My_List->list[index_next].prev == LIST_PHANTOM_INDEX)
+        My_List->list[LIST_PHANTOM_INDEX].prev = index_next;
 
     return LIST_IS_OK;
 }
@@ -165,3 +172,106 @@ List_Errors find_last_free(Node_Array* My_List, const int new_last_free)
 
     return LIST_IS_OK;
 }
+
+
+List_Errors erase_list_tail(Node_Array* My_List)
+{
+    int head_saver = My_List->list[LIST_PHANTOM_INDEX].next;
+
+    LIST_ERR(list_erase(My_List, get_list_tail(*My_List)), ERASING_ERROR);
+
+    My_List->list[LIST_PHANTOM_INDEX].next = head_saver;
+
+    return LIST_IS_OK;
+}
+
+
+List_Errors erase_list_head(Node_Array* My_List)
+{
+    int tail_saver = My_List->list[LIST_PHANTOM_INDEX].prev;
+
+    int list_index = get_list_head(*My_List);
+
+    My_List->list[LIST_PHANTOM_INDEX].next = My_List->list[list_index].prev;
+
+    LIST_ERR(list_erase(My_List, list_index), ERASING_ERROR);
+
+
+    My_List->list[LIST_PHANTOM_INDEX].prev = tail_saver;
+
+
+    return LIST_IS_OK;
+}
+
+
+List_Errors insert_list_head(Node_Array* My_List, const int elem)
+{
+    LIST_ERR(list_insert_after(My_List, get_list_head(*My_List), elem), INSERTION_ERROR);
+
+    return LIST_IS_OK;
+}
+
+
+List_Errors insert_list_tail(Node_Array* My_List, const int elem)
+{
+    int insertion_index = My_List->list[get_list_tail(*My_List)].prev;
+
+    LIST_ERR(list_insert_after(My_List, insertion_index, elem), INSERTION_ERROR);
+
+    return LIST_IS_OK;
+}
+
+
+int get_list_head(const Node_Array My_List)
+{
+    fprintf(stderr, "list's head is here:%d\n", My_List.list[LIST_PHANTOM_INDEX].next);
+
+    return My_List.list[LIST_PHANTOM_INDEX].next;
+}
+
+
+int get_list_tail(const Node_Array My_List)
+{
+    fprintf(stderr, "list's tail is here:%d\n", My_List.list[LIST_PHANTOM_INDEX].prev);
+
+    return My_List.list[LIST_PHANTOM_INDEX].prev;
+}
+
+
+int get_next_elem_index(const Node_Array My_List, const int current_index)
+{
+    fprintf(stderr, "next elem's index for elem:%d is here:%d\n", current_index, My_List.list[current_index].next);
+
+    return My_List.list[current_index].next;
+}
+
+
+int get_prev_elem_index(const Node_Array My_List, const int current_index)
+{
+    fprintf(stderr, "prev elem's index for elem:%d is here:%d\n", current_index, My_List.list[current_index].prev);
+
+    return My_List.list[current_index].prev;
+}
+
+
+List_Errors erase_all(Node_Array* My_List) // FIXME ERROR HERE
+{
+    int list_index = get_list_head(*My_List);
+
+    while(list_index != LIST_PHANTOM_INDEX)
+    {
+        int list_index_new = My_List->list[list_index].prev;
+
+        LIST_ERR(erase_list_head(My_List), ERASING_ERROR);
+
+        list_index = list_index_new;
+    }
+
+    return LIST_IS_OK;
+}
+
+
+// List_Errors get_elem_by_index()
+// {
+
+// }

@@ -106,7 +106,7 @@ Dump_Errors graph_dump(const Node_Array My_List, const char* const graph_dump)
             "splines = ortho;\n"
             "ranksep = 0.5;\n"
             "nodesep = 0.9;\n"
-            "bgcolor = \"#ff9c8c\";\n");
+            "bgcolor = \"#aedeb0\";\n");
 
 
 
@@ -125,7 +125,7 @@ Dump_Errors graph_dump(const Node_Array My_List, const char* const graph_dump)
     for(int dump_index = 0; dump_index < LIST_SIZE - 1; dump_index++)
     {
         fprintf(graph_dump_file,
-                "node%d:f3 -> node%d:f3[weight = 1000; color = \"#ff9c8c\"; headport = n];\n",
+                "node%d:f3 -> node%d:f3[weight = 1000; color = \"#aedeb0\"; headport = n];\n",
                 dump_index, dump_index + 1);
 
     }
@@ -136,7 +136,7 @@ Dump_Errors graph_dump(const Node_Array My_List, const char* const graph_dump)
     for(int dump_index = 0; dump_index < LIST_SIZE; dump_index++)
     {
         fprintf(graph_dump_file,
-                "node%d:s:f1 -> node%d:s:f1[constraint=false, color = \"#176617\"];\n",
+                "node%d -> node%d[constraint=false, color = \"red\"];\n",
                 dump_index, My_List.list[dump_index].next);
     }
 
@@ -146,15 +146,17 @@ Dump_Errors graph_dump(const Node_Array My_List, const char* const graph_dump)
         if(My_List.list[dump_index].prev != LIST_FREE_ATTR && My_List.list[dump_index].prev != dump_index)
         {
             fprintf(graph_dump_file,
-                    "node%d:n:f1 -> node%d:n:f1[constraint=false, color = \"blue\"];\n",
+                    "node%d -> node%d[constraint=false, color = \"blue\"];\n",
                     dump_index, My_List.list[dump_index].prev);
         }
     }
 
     fprintf(graph_dump_file, "\n");
 
-    fprintf(graph_dump_file, "FREE [fontcolor = \"red\", fontsize = 20, fontstyle = \"bold\", shape = record, label = \"free -> nodes%d\", style = rounded];", My_List.free);
-    fprintf(graph_dump_file, "FREE -> node%d [color = \"red\", headport=n];\n", My_List.free);
+    fprintf(graph_dump_file, "FREE [shape = record, fontcolor = \"red\", fontsize = 20, fontstyle = \"bold\","
+                             "label = \"free -> nodes%d\", style = rounded];", My_List.free);
+
+    fprintf(graph_dump_file, "FREE -> node%d[color = \"red\", headport=n];\n", My_List.free);
 
     fprintf(graph_dump_file, "\n");
 
@@ -174,19 +176,19 @@ Dump_Errors graph_dump(const Node_Array My_List, const char* const graph_dump)
 }
 
 
-Dump_Errors my_dump(const Node_Array My_List, const My_Dump_St General_Dump)
+Dump_Errors my_dump(const Node_Array My_List, My_Dump_St* General_Dump)
 {
-    assert(General_Dump.GRAPH_DUMP);
-    assert(General_Dump.TXT_DUMP);
+    assert(General_Dump->GRAPH_DUMP);
+    assert(General_Dump->TXT_DUMP);
 
-    graph_dump(My_List, General_Dump.GRAPH_DUMP);
+    graph_dump(My_List, General_Dump->GRAPH_DUMP);
 
-    text_dump(My_List.list, General_Dump.TXT_DUMP);
+    text_dump(My_List.list, General_Dump->TXT_DUMP);
 
-    make_html_file(General_Dump.HTML_DUMP);
+    if(General_Dump->filenum == 0)
+        make_html_file(General_Dump->HTML_DUMP);
 
-    dot_to_png(General_Dump.GRAPH_DUMP);
-
+    dot_to_png(General_Dump->GRAPH_DUMP, General_Dump);
 
     return DUMP_IS_OKAY;
 }
@@ -206,22 +208,21 @@ Dump_Errors dump_is_error(const Dump_Errors result, const char* name, const size
 }
 
 
-void dot_to_png(const char* name, const char* dump_filename)
+void dot_to_png(const char* name, My_Dump_St* General_Dump)
 {
     assert(name);
+
 
     char filename[300] = {};
 
     char pngname[200] = {};
-
-    long dump_time = rand();
 
     strcat(pngname, PATH);
     strcat(pngname, GRAPH);
 
     int offset = sizeof(PATH) + sizeof(GRAPH);
 
-    snprintf(pngname + offset, sizeof(dump_time), "%ld", dump_time);
+    snprintf(pngname + offset, sizeof(General_Dump->filenum), "%d", General_Dump->filenum);
 
     strcat(pngname, PNGXT);
 
@@ -237,7 +238,9 @@ void dot_to_png(const char* name, const char* dump_filename)
 
     system(filename);
 
-    fill_file_html();
+    fill_file_html(General_Dump->HTML_DUMP, pngname + sizeof(PATH) + 3);
+
+    General_Dump->filenum++;
 }
 
 void make_html_file(const char* filename)
@@ -246,14 +249,14 @@ void make_html_file(const char* filename)
 
     fprintf(dump_file,
             "<!DOCTYPE html>\n"
-            "<html lang="en">\n\n"
+            "<html lang=\"en\">\n\n"
             "<head>\n"
-            "\t<meta charset="utf-8">\n"
-            "\t<meta name="viewport" content="width=device-width, initial-scale=1">\n"
+            "\t<meta charset=\"utf-8\">\n"
+            "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=\">\n"
             "\t<title>list dump</title>\n"
-            "\t<link rel="stylesheet" href="styles.css">\n"
+            "\t<link rel=\"stylesheet\" href=\"styles.css\">\n"
             "</head>\n\n"
-            "<body>\n");
+            "<body>\n\n");
 
     fclose(dump_file);
 }
@@ -261,9 +264,9 @@ void make_html_file(const char* filename)
 
 void fill_file_html(const char* filename, const char* pngname)
 {
-    FILE* dump_file = fopen(filename, "w");
+    FILE* dump_file = fopen(filename, "a+");
     fprintf(dump_file,
-            "%s\n",
+            "<img src=\"%s\"/>\n",
             pngname);
 
     fclose(dump_file);
@@ -272,11 +275,10 @@ void fill_file_html(const char* filename, const char* pngname)
 
 void close_file_html(const char* filename)
 {
-    FILE* dump_file = fopen(filename, "w");
+    FILE* dump_file = fopen(filename, "a+");
     fprintf(dump_file,
             "<body>\n\n"
-            "</html>\n", );
+            "</html>\n");
 
     fclose(dump_file);
 }
-

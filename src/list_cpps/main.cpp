@@ -13,38 +13,34 @@ int main(void)
 
     My_Dump_St General_Dump = {};
 
-    graph_dump(My_List, General_Dump.GRAPH_DUMP);
+    my_dump(My_List, &General_Dump);
 
-    // fprintf(stderr, "enter 'c'\n");
-    // int input = 0;
-    // while((input = getchar()) != 'c')
-    // {
-    //     fprintf(stderr, "enter 'c'\n");
-    // }
+    LIST_ERR(insert_list_head(&My_List, 12), INSERTION_ERROR);
+    my_dump(My_List, &General_Dump);
 
-    LIST_ERR(list_insert_after(&My_List, 0, 12), INSERTION_ERROR);
-    // text_dump(My_List.list, General_Dump.TXT_DUMP);
-    // graph_dump(My_List, General_Dump.GRAPH_DUMP);
-    my_dump(My_List, General_Dump);
+    LIST_ERR(insert_list_head(&My_List, 1), INSERTION_ERROR);
+    my_dump(My_List, &General_Dump);
 
-    LIST_ERR(list_insert_after(&My_List, 1, 1), INSERTION_ERROR);
-    // text_dump(My_List.list, General_Dump.TXT_DUMP);
-    // graph_dump(My_List, General_Dump.GRAPH_DUMP);
+    LIST_ERR(insert_list_head(&My_List, 112), INSERTION_ERROR);
+    my_dump(My_List, &General_Dump);
 
-    LIST_ERR(list_insert_after(&My_List, 2, 121), INSERTION_ERROR);
-    // text_dump(My_List.list, General_Dump.TXT_DUMP);
-    // graph_dump(My_List, General_Dump.GRAPH_DUMP);
-    my_dump(My_List, General_Dump);
+    LIST_ERR(insert_list_head(&My_List, 121), INSERTION_ERROR);
+    my_dump(My_List, &General_Dump);
 
-    LIST_ERR(list_insert_after(&My_List, 1, 72), INSERTION_ERROR);
-    // text_dump(My_List.list, General_Dump.TXT_DUMP);
-    // graph_dump(My_List, General_Dump.GRAPH_DUMP);
-    my_dump(My_List, General_Dump);
+    // LIST_ERR(list_insert_after(&My_List, 0, 12), INSERTION_ERROR);
+    // my_dump(My_List, &General_Dump);
 
-    LIST_ERR(list_insert_after(&My_List, 2, 90), INSERTION_ERROR);
-    // text_dump(My_List.list, General_Dump.TXT_DUMP);
-    // graph_dump(My_List, General_Dump.GRAPH_DUMP);
-    my_dump(My_List, General_Dump);
+    // LIST_ERR(list_insert_after(&My_List, 1, 1), INSERTION_ERROR);
+    // my_dump(My_List, &General_Dump);
+
+    // LIST_ERR(list_insert_after(&My_List, 2, 121), INSERTION_ERROR);
+    // my_dump(My_List, &General_Dump);
+
+    // LIST_ERR(erase_all(&My_List), ERASING_ERROR);
+    // my_dump(My_List, &General_Dump);
+
+    // LIST_ERR(list_insert_after(&My_List, 2, 90), INSERTION_ERROR);
+    // my_dump(My_List, &General_Dump);
 
     close_file_html(General_Dump.HTML_DUMP);
 
@@ -52,3 +48,4 @@ int main(void)
 
     return 0;
 }
+

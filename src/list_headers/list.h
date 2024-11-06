@@ -62,4 +62,22 @@ List_Errors list_erase(Node_Array*, const int erase_index);
 
 List_Errors find_last_free(Node_Array* My_List, const int new_last_free);
 
+int get_list_head(const Node_Array My_List);
+
+int get_list_tail(const Node_Array My_List);
+
+int get_next_elem_index(const Node_Array My_List, const int current_index);
+
+int get_prev_elem_index(const Node_Array My_List, const int current_index);
+
+List_Errors insert_list_head(Node_Array* My_List, const int elem);
+
+List_Errors insert_list_tail(Node_Array* My_List, const int elem);
+
+List_Errors erase_list_head(Node_Array* My_List);
+
+List_Errors erase_list_tail(Node_Array* My_List);
+
+List_Errors erase_all(Node_Array* My_List);
+
 #endif // LIST_H_
