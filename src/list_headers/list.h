@@ -7,7 +7,6 @@
 
 #define LIST_ERR(result, error) if(list_is_error(result, __FILE__, __LINE__) == MACRO_ERR) return error
 
-const char* const DUMP_FILE_NAME = "dumps/list_dump.txt";
 
 typedef int ListElem_t;
 
@@ -57,13 +56,10 @@ List_Errors list_is_error(const List_Errors result, const char* name, const size
 
 void default_list_fill(Node_Array*);
 
-void list_dump(List *list, FILE* dump_file);
-
 List_Errors list_insert_after(Node_Array*, const int pre_insert_index, const ListElem_t elem);
 
 List_Errors list_erase(Node_Array*, const int erase_index);
 
 List_Errors find_last_free(Node_Array* My_List, const int new_last_free);
-
 
 #endif // LIST_H_

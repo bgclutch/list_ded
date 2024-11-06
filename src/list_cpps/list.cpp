@@ -37,24 +37,6 @@ List_Errors dtor_list(Node_Array* My_List)
 }
 
 
-void list_dump(List *list, FILE* dump_file)
-{
-    assert(list);
-    assert(dump_file);
-
-
-    fprintf(dump_file, "\n\nvalue\tindex\t prev\t next\n\n");
-
-    for(int index_list = LIST_PHANTOM_INDEX; index_list < LIST_SIZE; index_list++)
-    {
-        List* place = list + index_list;
-
-        fprintf(dump_file, "%5d\t%5d\t%5d\t%5d\t\n", place->data, index_list,  place->prev, place->next);
-    }
-
-}
-
-
 List_Errors list_is_error(const List_Errors result, const char* name, const size_t line)
 {
     assert(name);
@@ -101,6 +83,12 @@ List_Errors list_insert_after(Node_Array* My_List, const int pre_insert_index, c
     if(fabs(pre_insert_index) >= LIST_SIZE)
         return INSERTION_ERROR;
 
+    if(My_List->free == LIST_PHANTOM_INDEX)
+    {
+        fprintf(stderr, "NO MORE SPACE FOR INSERTIONS\n");
+        return INSERTION_ERROR;
+    }
+
 
     int insert_index = My_List->free;   // head (first free spot)
 
@@ -116,7 +104,7 @@ List_Errors list_insert_after(Node_Array* My_List, const int pre_insert_index, c
     int following_index = My_List->list[insert_index].next;
     My_List->list[following_index].prev = My_List->list[pre_insert_index].next;   // change prev for post_insert
 
-    My_List->list[LIST_PHANTOM_INDEX].next = My_List->free;
+    My_List->list[LIST_PHANTOM_INDEX].next = insert_index;
     My_List->list[LIST_PHANTOM_INDEX].prev = tail_saver;
 
     return LIST_IS_OK;
@@ -128,7 +116,13 @@ List_Errors list_erase(Node_Array* My_List, const int erase_index) // make elem 
     assert(My_List);
     assert(My_List->list);
 
-    if(fabs(erase_index) >= LIST_SIZE)
+    if(My_List->list[LIST_PHANTOM_INDEX].next == 0)
+    {
+        fprintf(stderr, "NOTHING TO ERASE\n");
+        return ERASING_ERROR;
+    }
+
+    if(fabs(erase_index) >= LIST_SIZE || My_List->list[erase_index].prev == LIST_FREE_ATTR)
         return ERASING_ERROR;
 
     int index_prev = My_List->list[erase_index].prev;
@@ -150,6 +144,13 @@ List_Errors list_erase(Node_Array* My_List, const int erase_index) // make elem 
 List_Errors find_last_free(Node_Array* My_List, const int new_last_free)
 {
     int list_index = My_List->free;
+
+    if(list_index == LIST_PHANTOM_INDEX && My_List->list[list_index].next != LIST_PHANTOM_INDEX)
+    {
+        My_List->free = new_last_free;
+        My_List->list[new_last_free].next = LIST_PHANTOM_INDEX;
+        return LIST_IS_OK;
+    }
 
     while(My_List->list[list_index].next != LIST_PHANTOM_INDEX)
     {
