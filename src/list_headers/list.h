@@ -21,7 +21,6 @@ static const int LIST_SIZE = 10;
 static const ListElem_t LIST_POISON = 0x5051;
 
 
-
 struct List
 {
     ListElem_t data;

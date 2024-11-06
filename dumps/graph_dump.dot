@@ -31,7 +31,7 @@ node6:f3 -> node7:f3[weight = 1000; color = "#aedeb0"; headport = n];
 node7:f3 -> node8:f3[weight = 1000; color = "#aedeb0"; headport = n];
 node8:f3 -> node9:f3[weight = 1000; color = "#aedeb0"; headport = n];
 
-node0 -> node4[constraint=false, fillcolor = "brown", color = "red"];
+node0 -> node4[constraint=false, color = "red"];
 node1 -> node2[constraint=false, color = "red"];
 node2 -> node3[constraint=false, color = "red"];
 node3 -> node4[constraint=false, color = "red"];
@@ -47,7 +47,11 @@ node2 -> node1[constraint=false, color = "blue"];
 node3 -> node2[constraint=false, color = "blue"];
 node4 -> node3[constraint=false, color = "blue"];
 
-FREE [shape = record, fontcolor = "red", fontsize = 20, fontstyle = "bold",label = "free -> nodes5", style = rounded];FREE -> node5[color = "red", headport=n];
-
+FREE [label = "free -> nodes5", style = rounded, style = "filled",fillcolor = "lightblue", shape = record, fontcolor = "red", fontsize = 20,fontstyle = "bold",];
+FREE -> node5[color = "red", headport=n];
+HEAD [label = "HEAD -> nodes4", style = rounded, style = "filled",fillcolor = "lightblue", shape = record, fontcolor = "red", fontsize = 20,fontstyle = "bold",];
+HEAD -> node4[color = "red", headport=n];
+TAIL [label = "TAIL -> nodes1", style = rounded, style = "filled",fillcolor = "lightblue", shape = record, fontcolor = "red", fontsize = 20,fontstyle = "bold",];
+TAIL -> node1[color = "red", headport=n];
 {rank = same; node0; node1; node2; node3; node4; node5; node6; node7; node8; node9;}
 }

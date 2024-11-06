@@ -8,8 +8,6 @@
 #include "../list_headers/list.h"
 
 
-
-
 Dump_Errors text_dump(List *list, const char* const text_dump)
 {
     assert(list);
@@ -36,37 +34,6 @@ Dump_Errors text_dump(List *list, const char* const text_dump)
 
     return DUMP_IS_OKAY;
 }
-
-
-
-Dump_Errors graph_dump_preparing(const char* const graph_dump)
-{
-    FILE* graph_dump_file = fopen(graph_dump, "w");
-
-    if(graph_dump_file == nullptr)
-        return GRAPH_DUMP_OPEN_ERR;
-
-
-    fprintf(graph_dump_file,
-            "digraph LIST{\n"
-            "harset=\"UTF-8\";\n"
-            "label = \"MY LIST)\";\n"
-            "rankdir=TB;\n"
-            "node=[fontsize = 9];\n"
-            "bgcolor=\"#0000aa\";\n"
-            "fontcolor=black;\n"
-            "fontsize=18;\n"
-            "style=\"italic\";\n"
-            "margin=0.3;\n"
-            "splines=ortho;\n"
-            "ranksep=1.0;\n"
-            "nodesep=0.9;\n"
-            "bgcolor=\"#ff9c8c\";\n"
-            "edge[color=\"#e8e6a5\"]\n;");
-
-    return DUMP_IS_OKAY;
-}
-
 
 
 Dump_Errors dumps_cleaning(const My_Dump_St General_Dump)
@@ -133,6 +100,7 @@ Dump_Errors graph_dump(const Node_Array My_List, const char* const graph_dump)
     fprintf(graph_dump_file, "\n");
 
 
+
     for(int dump_index = 0; dump_index < LIST_SIZE; dump_index++)
     {
         fprintf(graph_dump_file,
@@ -153,12 +121,24 @@ Dump_Errors graph_dump(const Node_Array My_List, const char* const graph_dump)
 
     fprintf(graph_dump_file, "\n");
 
-    fprintf(graph_dump_file, "FREE [shape = record, fontcolor = \"red\", fontsize = 20, fontstyle = \"bold\","
-                             "label = \"free -> nodes%d\", style = rounded];", My_List.free);
+
+    fprintf(graph_dump_file, "FREE [label = \"free -> nodes%d\", style = rounded, style = \"filled\","
+                             "fillcolor = \"lightblue\", shape = record, fontcolor = \"red\", fontsize = 20,"
+                             "fontstyle = \"bold\",];\n", My_List.free);
 
     fprintf(graph_dump_file, "FREE -> node%d[color = \"red\", headport=n];\n", My_List.free);
 
-    fprintf(graph_dump_file, "\n");
+    fprintf(graph_dump_file, "HEAD [label = \"HEAD -> nodes%d\", style = rounded, style = \"filled\","
+                             "fillcolor = \"lightblue\", shape = record, fontcolor = \"red\", fontsize = 20,"
+                             "fontstyle = \"bold\",];\n", My_List.list[LIST_PHANTOM_INDEX].next);
+
+    fprintf(graph_dump_file, "HEAD -> node%d[color = \"red\", headport=n];\n", My_List.list[LIST_PHANTOM_INDEX].next);
+
+    fprintf(graph_dump_file, "TAIL [label = \"TAIL -> nodes%d\", style = rounded, style = \"filled\","
+                             "fillcolor = \"lightblue\", shape = record, fontcolor = \"red\", fontsize = 20,"
+                             "fontstyle = \"bold\",];\n", My_List.list[LIST_PHANTOM_INDEX].prev);
+
+    fprintf(graph_dump_file, "TAIL -> node%d[color = \"red\", headport=n];\n", My_List.list[LIST_PHANTOM_INDEX].prev);
 
 
     fprintf(graph_dump_file,
