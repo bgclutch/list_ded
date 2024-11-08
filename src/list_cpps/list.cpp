@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include "../../src/list_headers/list.h"
+#include "../../src/list_headers/dumps.h"
 
 
 List_Errors ctor_list(Node_Array* My_List)
@@ -14,7 +15,10 @@ List_Errors ctor_list(Node_Array* My_List)
     My_List->list = (List*)calloc(sizeof(List), (size_t)LIST_SIZE);
 
     if(My_List->list == nullptr)
+    {
+        LIST_ERR(dtor_list(My_List), LIST_DTOR_ERR);
         return LIST_CTOR_ERR;
+    }
 
     My_List->free = LIST_START_INDEX;
 
@@ -81,11 +85,15 @@ List_Errors list_insert_after(Node_Array* My_List, const int pre_insert_index, c
     assert(My_List->list);
 
     if(fabs(pre_insert_index) >= LIST_SIZE)
+    {
+        LIST_ERR(dtor_list(My_List), LIST_DTOR_ERR);
         return INSERTION_ERROR;
+    }
 
     if(My_List->free == LIST_PHANTOM_INDEX)
     {
         fprintf(stderr, "NO MORE SPACE FOR INSERTIONS\n");
+        LIST_ERR(dtor_list(My_List), LIST_DTOR_ERR);
         return INSERTION_ERROR;
     }
 
@@ -119,14 +127,18 @@ List_Errors list_erase(Node_Array* My_List, const int erase_index) // make elem 
     assert(My_List);
     assert(My_List->list);
 
-    if(My_List->list[LIST_PHANTOM_INDEX].next == 0)
+    if(My_List->list[erase_index].prev == LIST_FREE_ATTR)
     {
         fprintf(stderr, "NOTHING TO ERASE\n");
+        LIST_ERR(dtor_list(My_List), LIST_DTOR_ERR);
         return ERASING_ERROR;
     }
 
     if(fabs(erase_index) >= LIST_SIZE || My_List->list[erase_index].prev == LIST_FREE_ATTR)
+    {
+        LIST_ERR(dtor_list(My_List), LIST_DTOR_ERR);
         return ERASING_ERROR;
+    }
 
     int index_prev = My_List->list[erase_index].prev;
     int index_next = My_List->list[erase_index].next;
@@ -162,7 +174,10 @@ List_Errors find_last_free(Node_Array* My_List, const int new_last_free)
     while(My_List->list[list_index].next != LIST_PHANTOM_INDEX)
     {
         if(My_List->list[list_index].prev != LIST_FREE_ATTR)
+        {
+            LIST_ERR(dtor_list(My_List), LIST_DTOR_ERR);
             return FIND_LAST_FREE_ERR;
+        }
 
         list_index = My_List->list[list_index].next;
     }
@@ -188,17 +203,13 @@ List_Errors erase_list_tail(Node_Array* My_List)
 
 List_Errors erase_list_head(Node_Array* My_List)
 {
-    int tail_saver = My_List->list[LIST_PHANTOM_INDEX].prev;
-
     int list_index = get_list_head(*My_List);
 
     My_List->list[LIST_PHANTOM_INDEX].next = My_List->list[list_index].prev;
 
     LIST_ERR(list_erase(My_List, list_index), ERASING_ERROR);
 
-
-    My_List->list[LIST_PHANTOM_INDEX].prev = tail_saver;
-
+    // My_List->list[LIST_PHANTOM_INDEX].prev = tail_saver;
 
     return LIST_IS_OK;
 }
@@ -254,11 +265,11 @@ int get_prev_elem_index(const Node_Array My_List, const int current_index)
 }
 
 
-List_Errors erase_all(Node_Array* My_List) // FIXME ERROR HERE
+List_Errors erase_all(Node_Array* My_List)
 {
     int list_index = get_list_head(*My_List);
 
-    while(list_index != LIST_PHANTOM_INDEX)
+    while(My_List->list[LIST_PHANTOM_INDEX].next != LIST_PHANTOM_INDEX)
     {
         int list_index_new = My_List->list[list_index].prev;
 
@@ -271,7 +282,11 @@ List_Errors erase_all(Node_Array* My_List) // FIXME ERROR HERE
 }
 
 
-// List_Errors get_elem_by_index()
-// {
+int get_elem_by_index(Node_Array* My_List, const int index)
+{
+    int elem = My_List->list[index].data;
 
-// }
+    fprintf(stderr, "your elem (with physical index %d) is %d\n", index, elem);
+
+    return elem;
+}

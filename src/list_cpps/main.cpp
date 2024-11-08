@@ -3,6 +3,7 @@
 
 #include "../list_headers/list.h"
 #include "../list_headers/dumps.h"
+#include "../list_headers/test.h"
 #include "../../lib_file_proc/file.h"
 
 int main(void)
@@ -15,32 +16,7 @@ int main(void)
 
     my_dump(My_List, &General_Dump);
 
-    LIST_ERR(insert_list_head(&My_List, 12), INSERTION_ERROR);
-    my_dump(My_List, &General_Dump);
-
-    LIST_ERR(insert_list_head(&My_List, 1), INSERTION_ERROR);
-    my_dump(My_List, &General_Dump);
-
-    LIST_ERR(insert_list_head(&My_List, 112), INSERTION_ERROR);
-    my_dump(My_List, &General_Dump);
-
-    LIST_ERR(insert_list_head(&My_List, 121), INSERTION_ERROR);
-    my_dump(My_List, &General_Dump);
-
-    // LIST_ERR(list_insert_after(&My_List, 0, 12), INSERTION_ERROR);
-    // my_dump(My_List, &General_Dump);
-
-    // LIST_ERR(list_insert_after(&My_List, 1, 1), INSERTION_ERROR);
-    // my_dump(My_List, &General_Dump);
-
-    // LIST_ERR(list_insert_after(&My_List, 2, 121), INSERTION_ERROR);
-    // my_dump(My_List, &General_Dump);
-
-    // LIST_ERR(erase_all(&My_List), ERASING_ERROR);
-    // my_dump(My_List, &General_Dump);
-
-    // LIST_ERR(list_insert_after(&My_List, 2, 90), INSERTION_ERROR);
-    // my_dump(My_List, &General_Dump);
+    LIST_ERR(test_func(&My_List, &General_Dump), TESTING_ERROR);
 
     close_file_html(General_Dump.HTML_DUMP);
 

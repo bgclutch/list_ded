@@ -25,14 +25,14 @@ enum Dump_Errors
 {
     DUMP_IS_OKAY             = 0x00,
     GRAPHIC_DUMP_ERR         = 0x01,
-    LIST_DUMP_ERR            = 0x02,
+    TEXT_DUMP_ERR            = 0x02,
     TXT_DUMP_OPEN_ERR        = 0x03,
     TXT_DUMP_CLOSE_ERR       = 0x04,
     GRAPH_DUMP_OPEN_ERR      = 0x05,
     GRAPH_DUMP_CLOSE_ERR     = 0x06,
     DUMP_ST_INIT_ERROR       = 0x07,
-    MACRO_DUMP_IS_GOOD       = 0x08,
-    MACRO_DUMP_IS_ERR        = 0x09,
+    MACRO_DUMP_IS_GOOD       = 0x10,
+    MACRO_DUMP_IS_ERR        = 0x20,
 };
 
 
@@ -46,8 +46,6 @@ struct My_Dump_St
 
 
 Dump_Errors text_dump(List *list, const char* const text_dump);
-
-Dump_Errors graph_dump_preparing(const char* const graph_dump);
 
 Dump_Errors graph_dump(const Node_Array My_List, const char* const graph_dump);
 
@@ -66,5 +64,6 @@ void make_html_file(const char* filename);
 void fill_file_html(const char* filename, const char* pngname);
 
 void close_file_html(const char* filename);
+
 
 #endif // DUMPS_H_

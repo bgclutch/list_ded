@@ -15,8 +15,11 @@ Dump_Errors text_dump(List *list, const char* const text_dump)
 
     FILE* text_dump_file = fopen(text_dump, "w");
 
-    if(text_dump == nullptr)
+    if(text_dump_file == nullptr)
+    {
+        fprintf(stderr, "text dump file open err\n");
         return TXT_DUMP_OPEN_ERR;
+    }
 
 
     fprintf(text_dump_file, "\n\nvalue\tindex\t prev\t next\n\n");
@@ -38,8 +41,6 @@ Dump_Errors text_dump(List *list, const char* const text_dump)
 
 Dump_Errors dumps_cleaning(const My_Dump_St General_Dump)
 {
-    fprintf(stderr, "penis dumps cleaning\n");
-
     FILE* first  = fopen(General_Dump.TXT_DUMP, "w");
     FILE* second = fopen(General_Dump.GRAPH_DUMP, "w");
 
@@ -100,7 +101,6 @@ Dump_Errors graph_dump(const Node_Array My_List, const char* const graph_dump)
     fprintf(graph_dump_file, "\n");
 
 
-
     for(int dump_index = 0; dump_index < LIST_SIZE; dump_index++)
     {
         fprintf(graph_dump_file,
@@ -126,19 +126,19 @@ Dump_Errors graph_dump(const Node_Array My_List, const char* const graph_dump)
                              "fillcolor = \"lightblue\", shape = record, fontcolor = \"red\", fontsize = 20,"
                              "fontstyle = \"bold\",];\n", My_List.free);
 
-    fprintf(graph_dump_file, "FREE -> node%d[color = \"red\", headport=n];\n", My_List.free);
+    fprintf(graph_dump_file, "FREE -> node%d[color = \"orange\", headport=n];\n", My_List.free);
 
     fprintf(graph_dump_file, "HEAD [label = \"HEAD -> nodes%d\", style = rounded, style = \"filled\","
                              "fillcolor = \"lightblue\", shape = record, fontcolor = \"red\", fontsize = 20,"
                              "fontstyle = \"bold\",];\n", My_List.list[LIST_PHANTOM_INDEX].next);
 
-    fprintf(graph_dump_file, "HEAD -> node%d[color = \"red\", headport=n];\n", My_List.list[LIST_PHANTOM_INDEX].next);
+    fprintf(graph_dump_file, "HEAD -> node%d[color = \"orange\", headport=n];\n", My_List.list[LIST_PHANTOM_INDEX].next);
 
     fprintf(graph_dump_file, "TAIL [label = \"TAIL -> nodes%d\", style = rounded, style = \"filled\","
                              "fillcolor = \"lightblue\", shape = record, fontcolor = \"red\", fontsize = 20,"
                              "fontstyle = \"bold\",];\n", My_List.list[LIST_PHANTOM_INDEX].prev);
 
-    fprintf(graph_dump_file, "TAIL -> node%d[color = \"red\", headport=n];\n", My_List.list[LIST_PHANTOM_INDEX].prev);
+    fprintf(graph_dump_file, "TAIL -> node%d[color = \"orange\", headport=n];\n", My_List.list[LIST_PHANTOM_INDEX].prev);
 
 
     fprintf(graph_dump_file,
@@ -161,9 +161,11 @@ Dump_Errors my_dump(const Node_Array My_List, My_Dump_St* General_Dump)
     assert(General_Dump->GRAPH_DUMP);
     assert(General_Dump->TXT_DUMP);
 
-    graph_dump(My_List, General_Dump->GRAPH_DUMP);
+    if(graph_dump(My_List, General_Dump->GRAPH_DUMP) != DUMP_IS_OKAY)
+        return GRAPHIC_DUMP_ERR;
 
-    text_dump(My_List.list, General_Dump->TXT_DUMP);
+    if(text_dump(My_List.list, General_Dump->TXT_DUMP) != DUMP_IS_OKAY)
+        return TEXT_DUMP_ERR;
 
     if(General_Dump->filenum == 0)
         make_html_file(General_Dump->HTML_DUMP);
@@ -192,35 +194,29 @@ void dot_to_png(const char* name, My_Dump_St* General_Dump)
 {
     assert(name);
 
+    size_t pngname_size = strlen(PATH) + strlen(GRAPH) + sizeof(General_Dump->filenum) + strlen(PNGXT);
 
-    char filename[300] = {};
+    char* pngname = (char*)calloc(pngname_size, sizeof(char));
 
-    char pngname[200] = {};
+    snprintf(pngname, pngname_size, "%s%s%d%s", PATH, GRAPH, General_Dump->filenum, PNGXT);
 
-    strcat(pngname, PATH);
-    strcat(pngname, GRAPH);
 
-    int offset = sizeof(PATH) + sizeof(GRAPH);
+    size_t dtpng_size = strlen(DOT) + strlen(SPACE) * 4 + strlen(name) + strlen(TPNG) + pngname_size + sizeof(OBJXT);
 
-    snprintf(pngname + offset, sizeof(General_Dump->filenum), "%d", General_Dump->filenum);
+    char* dot_to_png_command = (char*)calloc(dtpng_size, sizeof(char));
 
-    strcat(pngname, PNGXT);
+    snprintf(dot_to_png_command, dtpng_size, "%s%s%s%s%s%s%s%s%s", DOT, SPACE, name, SPACE, TPNG, SPACE, OBJXT,
+             SPACE, pngname);
 
-    strcat(filename, DOT);
-    strcat(filename, SPACE);
-    strcat(filename, name);
-    strcat(filename, SPACE);
-    strcat(filename, TPNG);
-    strcat(filename, SPACE);
-    strcat(filename, OBJXT);
-    strcat(filename, SPACE);
-    strcat(filename, pngname);
 
-    system(filename);
+    system(dot_to_png_command);
 
     fill_file_html(General_Dump->HTML_DUMP, pngname + sizeof(PATH) + 3);
 
     General_Dump->filenum++;
+
+    free(pngname);
+    free(dot_to_png_command);
 }
 
 void make_html_file(const char* filename)
@@ -257,7 +253,7 @@ void close_file_html(const char* filename)
 {
     FILE* dump_file = fopen(filename, "a+");
     fprintf(dump_file,
-            "<body>\n\n"
+            "</body>\n\n"
             "</html>\n");
 
     fclose(dump_file);

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 
-#define LIST_ERR(result, error) if(list_is_error(result, __FILE__, __LINE__) == MACRO_ERR) return error
+#define LIST_ERR(result, error) if(list_is_error(result, __FILE__, __LINE__) == MACRO_ERR)  return error
 
 
 typedef int ListElem_t;
@@ -44,6 +44,7 @@ enum List_Errors
     FIND_LAST_FREE_ERR = 0x05,
     INSERTION_ERROR    = 0x06,
     ERASING_ERROR      = 0x07,
+    TESTING_ERROR      = 0x08,
 };
 
 
@@ -78,5 +79,7 @@ List_Errors erase_list_head(Node_Array* My_List);
 List_Errors erase_list_tail(Node_Array* My_List);
 
 List_Errors erase_all(Node_Array* My_List);
+
+int get_elem_by_index(Node_Array* My_List, const int index);
 
 #endif // LIST_H_
